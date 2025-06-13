@@ -33,13 +33,14 @@ def check_win(mark, board):
 def cpu_move(turn):
     board = st.session_state.board5
     last_player_move = st.session_state.last_player_move
+    daruset=None
     if turn == 0:
-        daruset=True
         board[2][2] = "〇"  # 一手目
     elif turn == 2:
         r, c = last_player_move
         if r==1 and c==3:
             board[2][3] = "〇"
+            daruset=True
         else:
             board[1][3] = "〇"  # 三手目 (見える3x3に追加)
             daruset=False
