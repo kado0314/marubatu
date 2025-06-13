@@ -30,6 +30,7 @@ def check_win(mark, board):
 # CPUの固定手順に従う
 def cpu_move(turn):
     board = st.session_state.board5
+    last_player_move = st.session_state.last_player_move
     set=turn
     if turn == 0:
         board[2][2] = "〇"  # 一手目
@@ -56,6 +57,7 @@ def player_move(r, c):
     if board[r][c] != "" or st.session_state.game_over:
         return
     board[r][c] = "×"
+    st.session_state.last_player_move = (r, c)
     if check_win("×", board):
         st.session_state.message = "あなたの勝ちです！"
         st.session_state.game_over = True
