@@ -71,7 +71,7 @@ if not st.session_state.game_over:
             time.sleep(1.5)
             cpu_move(turn)
             st.session_state.turn += 1
-        st.experimental_rerun()
+        st.rerun()
     else:
         st.subheader("🧍 あなたの番です")
 
@@ -101,4 +101,4 @@ st.write(st.session_state.message)
 if st.button("🔄 リセット"):
     for k in list(st.session_state.keys()):
         del st.session_state[k]
-    st.experimental_rerun()
+    st.rerun()
