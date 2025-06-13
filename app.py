@@ -9,7 +9,9 @@ if "board5" not in st.session_state:
     st.session_state.game_over = False
     st.session_state.show_full_board = False
     st.session_state.last_player_move = None
-daruset=None
+if "daruset" not in st.session_state:
+    st.session_state.daruset = None
+
     
 
 # 勝利判定（3つそろい）
@@ -40,14 +42,14 @@ def cpu_move(turn):
         r, c = last_player_move
         if r==1 and c==3:
             board[2][3] = "〇"
-            daruset=True
+            st.session_state.daruset = True
         else:
             board[1][3] = "〇"  # 三手目 (見える3x3に追加)
-            daruset=False
+            st.session_state.daruset = False
     elif turn == 4:
         # 5ターン目：5x5に切り替え、直線で勝ち
         st.session_state.show_full_board = True
-        if daruset:
+        if st.session_state.daruset:
             board[2][4] = "〇" 
         else:
             board[0][4] = "〇"  
