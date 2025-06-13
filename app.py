@@ -1,104 +1,101 @@
 import streamlit as st
 import random
 
-st.set_page_config(page_title="理不尽○×ゲーム", layout="centered")
-
-# セッション状態の初期化
-if 'board' not in st.session_state:
-    st.session_state.board = [''] * 9
-    st.session_state.turn = 1
+# 初期化
+if "board" not in st.session_state:
+    st.session_state.board = [["" for _ in range(5)] for _ in range(5)]
+    st.session_state.turn = 0
     st.session_state.game_over = False
-    st.session_state.message = ''
+    st.session_state.message = ""
     st.session_state.cpu_moves = []
 
-# 勝利パターン定義
-WIN_PATTERNS = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],  # 横
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],  # 縦
-    [0, 4, 8], [2, 4, 6]              # 斜め
-]
-
-def check_win(player):
-    b = st.session_state.board
-    return any(all(b[i] == player for i in pattern) for pattern in WIN_PATTERNS)
-
-def cpu_turn():
+# 勝利判定（5x5対応）
+def check_win(mark):
     board = st.session_state.board
-    cpu_moves = st.session_state.cpu_moves
+    for r in range(5):
+        for c in range(3):
+            if all(board[r][c+i] == mark for i in range(3)):
+                return True
+    for c in range(5):
+        for r in range(3):
+            if all(board[r+i][c] == mark for i in range(3)):
+                return True
+    for r in range(3):
+        for c in range(3):
+            if all(board[r+i][c+i] == mark for i in range(3)):
+                return True
+            if all(board[r+2-i][c+i] == mark for i in range(3)):
+                return True
+    return False
 
-    if st.session_state.turn == 1:
-        board[4] = '○'
-        cpu_moves.append(4)
-
-    elif st.session_state.turn == 3:
-        empty = [i for i in range(9) if board[i] == '']
-        move = random.choice(empty)
-        board[move] = '○'
-        cpu_moves.append(move)
-
-    elif st.session_state.turn == 5:
-        for pattern in WIN_PATTERNS:
-            filled = [i for i in pattern if i in cpu_moves]
-            empty = [i for i in pattern if board[i] == '']
-            if len(filled) == 2 and len(empty) == 1:
-                board[empty[0]] = '○'
-                cpu_moves.append(empty[0])
-                break
-
-    if check_win('○'):
-        st.session_state.game_over = True
-        st.session_state.message = 'CPUの勝ちです！（理不尽）'
-
-    st.session_state.turn += 1
-
-def player_turn(pos):
+# CPUの行動
+def cpu_move():
     board = st.session_state.board
+    cpu_turn = st.session_state.turn
 
-    if board[pos] == '' and not st.session_state.game_over:
-        board[pos] = '×'
-        st.session_state.turn += 1
-
-        if check_win('×'):
+    if cpu_turn == 0:
+        board[2][2] = "〇"  # 中央
+        st.session_state.cpu_moves.append((2, 2))
+    elif cpu_turn == 2:
+        # ランダムに可視3x3範囲から未使用マスを探す
+        empty = [(r, c) for r in range(1, 4) for c in range(1, 4) if board[r][c] == ""]
+        if empty:
+            r, c = random.choice(empty)
+            board[r][c] = "〇"
+            st.session_state.cpu_moves.append((r, c))
+    elif cpu_turn == 4:
+        # 最後に「不可視」マス(0行や4行/列)を使って直線にする
+        (r1, c1), (r2, c2) = st.session_state.cpu_moves
+        dr = r2 - r1
+        dc = c2 - c1
+        r3 = r2 + dr
+        c3 = c2 + dc
+        # 画面外(0か4)を狙うように調整
+        r3 = max(0, min(4, r3))
+        c3 = max(0, min(4, c3))
+        board[r3][c3] = "〇"
+        st.session_state.cpu_moves.append((r3, c3))
+        if check_win("〇"):
+            st.session_state.message = "CPUの勝ちです！"
             st.session_state.game_over = True
-            st.session_state.message = 'あなたの勝ちです！'
+
+# プレイヤーの操作
+def player_move(r, c):
+    if st.session_state.board[r][c] != "" or st.session_state.game_over:
+        return
+    st.session_state.board[r][c] = "×"
+    if check_win("×"):
+        st.session_state.message = "あなたの勝ちです！"
+        st.session_state.game_over = True
+
+# 描画
+st.title("○×ゲーム（CPU理不尽勝利モード）")
+
+if not st.session_state.game_over and st.session_state.turn % 2 == 0:
+    cpu_move()
+
+for r in range(1, 4):
+    cols = st.columns(3)
+    for c in range(1, 4):
+        cell = st.session_state.board[r][c]
+        if cell == "":
+            if not st.session_state.game_over:
+                if cols[c-1].button(" ", key=f"{r}-{c}"):
+                    player_move(r, c)
+                    st.session_state.turn += 1
         else:
-            cpu_turn()
+            cols[c-1].button(cell, key=f"{r}-{c}", disabled=True)
 
-def reset_game():
-    st.session_state.board = [''] * 9
-    st.session_state.turn = 1
-    st.session_state.game_over = False
-    st.session_state.message = ''
-    st.session_state.cpu_moves = []
-    cpu_turn()
+# CPUのターンが後に控えている場合、自動で回す
+if not st.session_state.game_over and st.session_state.turn % 2 == 1:
+    st.session_state.turn += 1
+    cpu_move()
 
-# UI表示
-st.title('理不尽○×ゲーム')
-st.caption('CPUは絶対に勝ちます 😈')
+st.write("----")
+st.write(st.session_state.message)
 
-# ゲーム開始時にCPUの初手
-if st.session_state.turn == 1 and not st.session_state.cpu_moves:
-    cpu_turn()
-
-# ゲーム盤面描画
-cols = st.columns(3)
-for i in range(3):
-    for j in range(3):
-        index = i * 3 + j
-        with cols[j]:
-            if st.session_state.board[index] == '':
-                if not st.session_state.game_over:
-                    if st.button(" ", key=str(index), help=f"{i+1}行{j+1}列"):
-                        player_turn(index)
-                else:
-                    st.button(" ", key=str(index), disabled=True)
-            else:
-                st.button(st.session_state.board[index], key=str(index), disabled=True)
-
-# メッセージ表示
-if st.session_state.message:
-    st.markdown(f"### {st.session_state.message}")
-
-# リセットボタン
-if st.button('もう一度遊ぶ'):
-    reset_game()
+# リセット
+if st.button("リセット"):
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    st.experimental_rerun()
