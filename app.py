@@ -51,6 +51,10 @@ def cpu_move(turn):
             board[2][4] = "〇" 
         else:
             board[0][4] = "〇"  
+        for r in range(5):
+            for c in range(5):
+                if board[r][c] == "":
+                    board[r][c] = "-"
         st.session_state.message = "CPUの勝ちです！（理不尽）"
         st.session_state.game_over = True
 
