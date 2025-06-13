@@ -32,7 +32,7 @@ def check_win(mark, board):
 def cpu_move(turn):
     board = st.session_state.board5
     last_player_move = st.session_state.last_player_move
-    set=True
+    daruset=True
     if turn == 0:
         board[2][2] = "〇"  # 一手目
     elif turn == 2:
@@ -41,7 +41,7 @@ def cpu_move(turn):
             board[2][3] = "〇"
         else:
             board[1][3] = "〇"  # 三手目 (見える3x3に追加)
-            set=False
+            daruset=False
     elif turn == 4:
         # 5ターン目：5x5に切り替え、直線で勝ち
         st.session_state.show_full_board = True
