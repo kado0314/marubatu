@@ -9,6 +9,7 @@ if "board5" not in st.session_state:
     st.session_state.game_over = False
     st.session_state.show_full_board = False
     st.session_state.last_player_move = None
+daruset=None
     
 
 # 勝利判定（3つそろい）
@@ -30,7 +31,6 @@ def check_win(mark, board):
     return False
 
 # CPUの固定手順に従う
-daruset=None
 def cpu_move(turn):
     board = st.session_state.board5
     last_player_move = st.session_state.last_player_move
