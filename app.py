@@ -9,7 +9,7 @@ if "board5" not in st.session_state:
     st.session_state.game_over = False
     st.session_state.show_full_board = False
     st.session_state.last_player_move = None
-    daruset=True
+    
 
 # 勝利判定（3つそろい）
 def check_win(mark, board):
@@ -33,7 +33,9 @@ def check_win(mark, board):
 def cpu_move(turn):
     board = st.session_state.board5
     last_player_move = st.session_state.last_player_move
+    daruset
     if turn == 0:
+        daruset=True
         board[2][2] = "〇"  # 一手目
     elif turn == 2:
         r, c = last_player_move
