@@ -8,6 +8,7 @@ if "board5" not in st.session_state:
     st.session_state.message = ""
     st.session_state.game_over = False
     st.session_state.show_full_board = False
+    st.session_state.last_player_move = None
 
 # 勝利判定（3つそろい）
 def check_win(mark, board):
