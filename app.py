@@ -30,21 +30,25 @@ def check_win(mark, board):
 # CPUの固定手順に従う
 def cpu_move(turn):
     board = st.session_state.board5
+    set=turn
     if turn == 0:
         board[2][2] = "〇"  # 一手目
     elif turn == 2:
-        board[1][3] = "〇"  # 三手目 (見える3x3に追加)
+        r, c = last_player_move
+        if r==1 and c==3:
+            board[2][3] = "〇"
+        else:
+            board[1][3] = "〇"  # 三手目 (見える3x3に追加)
+            set=false
     elif turn == 4:
         # 5ターン目：5x5に切り替え、直線で勝ち
         st.session_state.show_full_board = True
-        board[0][4] = "〇"
-        board[1][3] = "〇"
-        board[2][2] = "〇"
-        board[3][1] = "〇"
-        board[4][0] = "〇"
-        if check_win("〇", board):
-            st.session_state.message = "CPUの勝ちです！（理不尽）"
-            st.session_state.game_over = True
+        if set:
+            board[2][4] = "〇" 
+        else:
+           board[0][4] = "〇"  
+        st.session_state.message = "CPUの勝ちです！（理不尽）"
+        st.session_state.game_over = True
 
 # プレイヤーの操作
 def player_move(r, c):
