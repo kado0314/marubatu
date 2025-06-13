@@ -45,7 +45,7 @@ def cpu_move(turn):
     elif turn == 4:
         # 5ターン目：5x5に切り替え、直線で勝ち
         st.session_state.show_full_board = True
-        if set:
+        if daruset:
             board[2][4] = "〇" 
         else:
             board[0][4] = "〇"  
