@@ -30,10 +30,10 @@ def check_win(mark, board):
     return False
 
 # CPUの固定手順に従う
+daruset=None
 def cpu_move(turn):
     board = st.session_state.board5
     last_player_move = st.session_state.last_player_move
-    daruset=None
     if turn == 0:
         board[2][2] = "〇"  # 一手目
     elif turn == 2:
