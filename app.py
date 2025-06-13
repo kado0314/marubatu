@@ -33,7 +33,6 @@ def check_win(mark, board):
 def cpu_move(turn):
     board = st.session_state.board5
     last_player_move = st.session_state.last_player_move
-    daruset
     if turn == 0:
         daruset=True
         board[2][2] = "〇"  # 一手目
